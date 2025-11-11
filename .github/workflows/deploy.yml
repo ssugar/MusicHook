@@ -34,7 +34,7 @@ jobs:
       - name: Build static site
         run: npm run build
         env:
-          VITE_GH_PAGES_BASE: /musichook/
+          VITE_GH_PAGES_BASE: /MusicHook/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

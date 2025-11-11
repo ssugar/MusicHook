@@ -97,7 +97,7 @@ Happy practicing!
 
 Deployments are automated through GitHub Actions (`.github/workflows/deploy.yml`). On pushes to `main` (or a manual workflow dispatch) the action:
 
-- installs dependencies and runs `npm run build` with `VITE_GH_PAGES_BASE=/musichook/`
+- installs dependencies and runs `npm run build` with `VITE_GH_PAGES_BASE=/MusicHook/`
 - uploads the contents of `dist/`
 - publishes the artifact to GitHub Pages
 
