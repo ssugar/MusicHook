@@ -92,3 +92,20 @@ Run `npm test` for the full suite; coverage reports emit to console plus `covera
 - Plug in audio playback or persistence later—the architecture keeps rendering logic pure so a future backend or audio engine can be layered on without refactoring core components.
 
 Happy practicing!
+
+## GitHub Pages Deployment
+
+Deployments are automated through GitHub Actions (`.github/workflows/deploy.yml`). On pushes to `main` (or a manual workflow dispatch) the action:
+
+- installs dependencies and runs `npm run build` with `VITE_GH_PAGES_BASE=/musichook/`
+- uploads the contents of `dist/`
+- publishes the artifact to GitHub Pages
+
+After the first successful run, enable GitHub Pages in the repository settings (`Settings → Pages`) and choose “GitHub Actions” as the source. The site will be available at `https://<your-username>.github.io/musichook/`.
+
+Deep links such as `/musichook/treble` use a custom fallback located in `public/404.html`. If you rename the repository or host under a different base path, update the following to keep navigation working:
+
+- `VITE_GH_PAGES_BASE` in `vite.config.ts` (and the workflow environment variable)
+- the `targetBase` constant in `public/404.html`
+
+For forks that publish at the root of a `username.github.io` repository or a custom domain, set `VITE_GH_PAGES_BASE=/` and adjust `targetBase` accordingly.

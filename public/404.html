@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirecting…</title>
+    <script>
+      ;(function () {
+        var targetBase = '/musichook/'
+        if (!targetBase.endsWith('/')) {
+          targetBase += '/'
+        }
+
+        var redirectPath =
+          location.pathname + location.search + location.hash || '/'
+        sessionStorage.setItem('musichook-redirect', redirectPath)
+
+        window.location.replace(window.location.origin + targetBase)
+      })()
+    </script>
+  </head>
+  <body></body>
+</html>
