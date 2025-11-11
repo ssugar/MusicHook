@@ -21,14 +21,12 @@
 
 .noteHead {
   fill: var(--accent-strong);
-  opacity: 0.25;
-}
-
-.noteHeadFill {
-  fill: var(--accent-strong);
+  stroke: var(--accent-strong);
+  stroke-width: 1.4;
   transform: rotate(-18deg);
   transform-origin: center;
-  transition: transform 0.25s ease, fill 0.25s ease;
+  transform-box: fill-box;
+  transition: transform 0.25s ease;
 }
 
 .clef {
