@@ -1,0 +1,112 @@
+.appShell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--surface-app);
+  color: var(--text-primary);
+  font-family: var(--font-family-base);
+}
+
+.skipLink {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: var(--text-on-accent);
+  border-radius: 0.5rem;
+  transform: translateY(-200%);
+  transition: transform 0.2s ease;
+  z-index: 10;
+}
+
+.skipLink:focus {
+  transform: translateY(0);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem clamp(1rem, 4vw, 2rem);
+  background: var(--surface-header);
+  border-bottom: 1px solid var(--border-subtle);
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.branding {
+  flex: 1 0 auto;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  letter-spacing: 0.08ch;
+}
+
+.nav {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.navLink {
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  background: transparent;
+  text-decoration: none;
+  color: var(--text-primary);
+  border: 1px solid transparent;
+  font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease, border 0.2s ease;
+}
+
+.navLink:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.navLinkActive {
+  background: var(--accent-muted);
+  border-color: var(--accent-border);
+  color: var(--accent-strong);
+}
+
+.themeControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.themeLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.themeSelect {
+  min-width: 11rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+.main {
+  padding: clamp(1rem, 4vw, 2rem);
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.footer {
+  padding: 1.5rem clamp(1rem, 4vw, 2rem);
+  background: var(--surface-header);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+}

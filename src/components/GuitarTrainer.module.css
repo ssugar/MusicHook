@@ -1,0 +1,95 @@
+.container {
+  display: grid;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  width: min(1200px, 100%);
+  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+}
+
+.sidebar {
+  background: var(--surface-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1.25rem;
+  padding: clamp(1rem, 3vw, 2rem);
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+.heading {
+  margin: 0;
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
+}
+
+.targetLabel {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.preferenceGroup {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.toggle {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.selectionInfo {
+  font-weight: 600;
+}
+
+.feedback {
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--surface-muted);
+  font-weight: 600;
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.correct {
+  background: var(--surface-correct);
+}
+
+.incorrect {
+  background: var(--surface-incorrect);
+}
+
+.warning {
+  background: var(--surface-highlight);
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.primaryButton,
+.secondaryButton {
+  padding: 0.55rem 1.1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+}
+
+.primaryButton {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+.secondaryButton {
+  background: var(--surface-muted);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+
+@media (max-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+}

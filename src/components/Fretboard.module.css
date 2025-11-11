@@ -1,0 +1,125 @@
+.fretboardWrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.fretboard {
+  width: min(100%, 760px);
+  outline: none;
+  cursor: pointer;
+}
+
+.body {
+  fill: var(--surface-panel);
+  stroke: var(--border-strong);
+  stroke-width: 2;
+}
+
+.stringLine {
+  stroke: var(--border-strong);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.fretLine {
+  stroke: var(--border-subtle);
+  stroke-width: 2;
+}
+
+.nut {
+  stroke: var(--text-secondary);
+  stroke-width: 6;
+}
+
+.fretMarker {
+  fill: var(--border-strong);
+  opacity: 0.4;
+}
+
+.stringLabel {
+  fill: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-anchor: end;
+  dominant-baseline: middle;
+}
+
+.openPosition {
+  cursor: pointer;
+}
+
+.openHit {
+  fill: transparent;
+  stroke: var(--border-strong);
+  stroke-width: 2;
+  transition: fill 0.15s ease, opacity 0.15s ease;
+  pointer-events: auto;
+}
+
+.openHit:hover {
+  fill: var(--surface-highlight);
+  opacity: 0.6;
+}
+
+.position {
+  transition: transform 0.1s ease;
+}
+
+.hitArea {
+  fill: transparent;
+  transition: fill 0.15s ease, opacity 0.15s ease;
+}
+
+.hitArea:hover {
+  fill: var(--surface-highlight);
+  opacity: 0.6;
+}
+
+.active {
+  fill: var(--surface-correct);
+}
+
+.highlighted {
+  fill: var(--surface-highlight);
+  opacity: 0.75;
+}
+
+.selection {
+  fill: var(--accent);
+  opacity: 0.8;
+}
+
+.highlightDot {
+  fill: var(--accent);
+  opacity: 0.6;
+}
+
+.disabled {
+  pointer-events: none;
+  fill: var(--surface-highlight);
+  opacity: 0.55;
+}
+
+.disabledCheck {
+  stroke: var(--success);
+  stroke-width: 2.4px;
+  stroke-linecap: round;
+  fill: none;
+}
+
+.fretLabel {
+  fill: var(--text-secondary);
+  font-size: 0.7rem;
+  text-anchor: middle;
+}
+
+.fretboard:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+@media (max-width: 640px) {
+  .fretboard {
+    width: 720px;
+  }
+}

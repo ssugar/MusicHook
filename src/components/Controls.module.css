@@ -1,0 +1,110 @@
+.controls {
+  display: grid;
+  gap: 1rem;
+  background: var(--surface-panel);
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border-radius: 1rem;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 8px 18px rgba(15, 20, 35, 0.12);
+}
+
+.modeGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.modeButton {
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-muted);
+  color: var(--text-primary);
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.modeButton:hover {
+  background: var(--accent-muted);
+}
+
+.active {
+  background: var(--accent);
+  border-color: var(--accent-border);
+  color: var(--text-on-accent);
+}
+
+.timerControls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-left: auto;
+}
+
+.timerButton,
+.timerButtonSecondary {
+  padding: 0.45rem 0.85rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+}
+
+.timerButton {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+.timerButtonSecondary {
+  background: var(--surface-muted);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.timeRemaining {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  min-width: 3.5rem;
+  text-align: right;
+  display: inline-block;
+}
+
+.body {
+  display: grid;
+  gap: 1rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.stats div {
+  background: var(--surface-muted);
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-subtle);
+}
+
+.stats dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.stats dd {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+@media (max-width: 680px) {
+  .timerControls {
+    width: 100%;
+    justify-content: space-between;
+    margin-left: 0;
+  }
+}

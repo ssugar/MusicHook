@@ -1,0 +1,48 @@
+.staff {
+  width: min(100%, 420px);
+  margin: 0;
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.staffLine {
+  stroke: var(--border-strong);
+  stroke-width: 2;
+}
+
+.ledger {
+  stroke: var(--border-strong);
+  stroke-width: 2;
+}
+
+.noteHead {
+  fill: var(--accent-strong);
+  opacity: 0.25;
+}
+
+.noteHeadFill {
+  fill: var(--accent-strong);
+  transform: rotate(-18deg);
+  transform-origin: center;
+  transition: transform 0.25s ease, fill 0.25s ease;
+}
+
+.clef {
+  fill: none;
+  stroke: var(--text-secondary);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.accidental {
+  fill: none;
+  stroke: var(--text-secondary);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

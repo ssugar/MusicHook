@@ -1,0 +1,89 @@
+.wrapper {
+  position: relative;
+  width: min(100%, 560px);
+  margin: 0 auto;
+  padding: 0.75rem 0;
+}
+
+.whiteKeys {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(14, 1fr);
+  background: var(--surface-elevated);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.key {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+  height: clamp(130px, 30vw, 180px);
+  font-size: 0.75rem;
+  letter-spacing: 0.01em;
+  pointer-events: auto;
+  transition: transform 0.1s ease, background 0.1s ease, box-shadow 0.1s ease;
+}
+
+.noteName {
+  font-weight: 600;
+}
+
+.shortcut {
+  font-size: 0.65rem;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+
+.white {
+  background: linear-gradient(180deg, var(--surface-elevated), var(--surface-app));
+  border-right: 1px solid var(--border-subtle);
+}
+
+.white:last-child {
+  border-right: none;
+}
+
+.blackKeys {
+  position: absolute;
+  top: 0.75rem;
+  left: 0;
+  height: calc(100% - 1.5rem);
+  width: 100%;
+  pointer-events: none;
+}
+
+.blackKeys .key {
+  position: absolute;
+  width: calc(100% / 14 * 0.65);
+  height: 60%;
+  background: linear-gradient(180deg, #111b25, #05090f);
+  color: #fdfdfd;
+  border-radius: 0.5rem;
+  border: 1px solid #28313b;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+}
+
+.blackKeys .shortcut {
+  color: #d5d8dc;
+}
+
+.active {
+  transform: translateY(2px);
+  box-shadow: inset 0 0 0 3px var(--surface-highlight);
+}
+
+.key:focus-visible {
+  z-index: 3;
+}
+
+@media (max-width: 520px) {
+  .noteName {
+    display: none;
+  }
+}
