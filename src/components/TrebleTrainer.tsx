@@ -1,40 +1,36 @@
 import { useCallback, useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
 import Controls from './Controls'
 import Staff from './Staff'
-import Piano from './Piano'
 import styles from './TrebleTrainer.module.css'
 import {
-  NOTE_NAME_OPTIONS,
-  TREBLE_OCTAVE_OPTIONS,
-  TREBLE_SCOPE_NOTES,
-  equalPitch,
+  NATURAL_PITCH_CLASSES,
+  TREBLE_SCOPE_C_MAJOR_NOTES,
   formatNote,
   toCanonical,
-  toEnharmonicFlat,
-  type Note,
   type PitchClass,
 } from '../utils/noteUtils'
 import { useDrill, type DrillSubmissionResult } from '../hooks/useDrill'
+import { createSeededRandom } from '../utils/random'
 
 type FeedbackState =
   | { status: 'idle' }
   | { status: 'correct'; message: string }
   | { status: 'incorrect'; message: string }
 
-const DEFAULT_NOTE: Note = { name: 'C', octave: 4 }
-
 const TrebleTrainer = () => {
-  const [selectedName, setSelectedName] = useState<PitchClass>('C')
-  const [selectedOctave, setSelectedOctave] = useState<number>(4)
+  const [selectedAnswer, setSelectedAnswer] = useState<PitchClass | null>(null)
   const [feedback, setFeedback] = useState<FeedbackState>({ status: 'idle' })
+  const rng = useMemo(() => createSeededRandom(Date.now()), [])
 
-  const drill = useDrill<Note, DrillSubmissionResult>({
-    pool: TREBLE_SCOPE_NOTES,
-    evaluate: (target, answer) => ({
-      correct: equalPitch(target, answer),
-      canonical: toCanonical(target),
-    }),
+  const drill = useDrill<PitchClass, DrillSubmissionResult>({
+    pool: TREBLE_SCOPE_C_MAJOR_NOTES,
+    evaluate: (target, answer) => {
+      const canonical = toCanonical(target)
+      return {
+        correct: canonical.name === answer,
+        canonical,
+      }
+    },
   })
 
   const targetCanonical = useMemo(
@@ -42,45 +38,44 @@ const TrebleTrainer = () => {
     [drill.targetNote],
   )
 
-  const handleSelectNote = useCallback((note: Note) => {
-    setSelectedName(note.name as PitchClass)
-    setSelectedOctave(note.octave)
-  }, [])
+  const choiceOptions = useMemo(() => {
+    const correct = targetCanonical.name as PitchClass
+    const distractors = rng
+      .shuffle(NATURAL_PITCH_CLASSES.filter((pitch) => pitch !== correct))
+      .slice(0, 3)
+    return rng.shuffle([correct, ...distractors])
+  }, [rng, targetCanonical])
 
   const resetForNext = useCallback(() => {
     setFeedback({ status: 'idle' })
+    setSelectedAnswer(null)
   }, [])
 
-  const handleSubmit = useCallback(() => {
-    const answer: Note = { name: selectedName, octave: selectedOctave }
-    const result = drill.submitAnswer(answer)
-    if (result.correct) {
-      setFeedback({
-        status: 'correct',
-        message: `Correct! ${formatNote(result.canonical)}`,
-      })
-    } else {
-      const enharmonic = toEnharmonicFlat(result.canonical)
-      const enharmonicLabel =
-        enharmonic.name !== result.canonical.name
-          ? ` / ${formatNote(enharmonic)}`
-          : ''
-      setFeedback({
-        status: 'incorrect',
-        message: `Try again. Correct answer: ${formatNote(result.canonical)}${enharmonicLabel}`,
-      })
-    }
-  }, [drill, selectedName, selectedOctave])
-
-  const onFormSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    handleSubmit()
-  }
+  const handleAnswer = useCallback(
+    (choice: PitchClass) => {
+      if (feedback.status === 'correct') {
+        return
+      }
+      setSelectedAnswer(choice)
+      const result = drill.submitAnswer(choice)
+      if (result.correct) {
+        setFeedback({
+          status: 'correct',
+          message: `Correct! ${formatNote(result.canonical)}`,
+        })
+      } else {
+        setFeedback({
+          status: 'incorrect',
+          message: 'Try again!',
+        })
+      }
+    },
+    [drill, feedback.status],
+  )
 
   const onNext = () => {
     drill.nextTarget()
     resetForNext()
-    handleSelectNote(DEFAULT_NOTE)
   }
 
   const feedbackMessage =
@@ -90,12 +85,12 @@ const TrebleTrainer = () => {
     <div className={styles.container}>
       <section className={styles.visualPanel}>
         <h2 className={styles.heading}>Treble Clef Trainer</h2>
-        <p className={styles.targetLabel} aria-live="polite">
-          Find: {formatNote(targetCanonical)}
+        <p className={styles.prompt} aria-live="polite">
+          Which note is shown on the staff?
         </p>
         <Staff
           note={targetCanonical}
-          aria-label={`Identify note ${formatNote(targetCanonical)} on the treble staff`}
+          aria-label={`Treble staff showing ${formatNote(targetCanonical)} for identification`}
         />
       </section>
       <Controls
@@ -108,65 +103,32 @@ const TrebleTrainer = () => {
         onStartTimed={drill.startTimed}
         onResetTimed={drill.resetTimed}
       >
-        <form className={styles.answerForm} onSubmit={onFormSubmit}>
-          <fieldset className={styles.answerGroup}>
-            <legend className="visuallyHidden">Answer using dropdowns</legend>
-            <label htmlFor="note-name" className={styles.inputLabel}>
-              Note name
-            </label>
-            <select
-              id="note-name"
-              className={styles.select}
-              value={selectedName}
-              onChange={(event) =>
-                setSelectedName(event.target.value as PitchClass)
-              }
-            >
-              {NOTE_NAME_OPTIONS.map((option) => (
-                <option value={option} key={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-
-            <label htmlFor="note-octave" className={styles.inputLabel}>
-              Octave
-            </label>
-            <select
-              id="note-octave"
-              className={styles.select}
-              value={selectedOctave}
-              onChange={(event) =>
-                setSelectedOctave(Number.parseInt(event.target.value, 10))
-              }
-            >
-              {TREBLE_OCTAVE_OPTIONS.map((octave) => (
-                <option value={octave} key={octave}>
-                  {octave}
-                </option>
-              ))}
-            </select>
-            <div className={styles.actions}>
-              <button type="submit" className={styles.primaryButton}>
-                Check
-              </button>
+        <ul className={styles.options} role="list">
+          {choiceOptions.map((option) => (
+            <li key={option} className={styles.optionItem} role="listitem">
               <button
                 type="button"
-                className={styles.secondaryButton}
-                onClick={onNext}
+                className={`${styles.optionButton}${
+                  selectedAnswer === option ? ` ${styles.optionSelected}` : ''
+                }`}
+                onClick={() => handleAnswer(option)}
+                aria-pressed={selectedAnswer === option}
+                disabled={feedback.status === 'correct'}
               >
-                Next
+                {option}
               </button>
-            </div>
-          </fieldset>
-        </form>
+            </li>
+          ))}
+        </ul>
 
-        <div>
-          <h3 className={styles.subheading}>On-screen piano</h3>
-          <Piano
-            activeNote={{ name: selectedName, octave: selectedOctave }}
-            onSelect={handleSelectNote}
-          />
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            onClick={onNext}
+          >
+            Next
+          </button>
         </div>
 
         <div
@@ -180,7 +142,7 @@ const TrebleTrainer = () => {
           role="status"
           aria-live="polite"
         >
-          {feedbackMessage || 'Awaiting answer...'}
+          {feedbackMessage || 'Select the correct note name.'}
         </div>
       </Controls>
     </div>

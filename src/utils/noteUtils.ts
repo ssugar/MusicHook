@@ -234,6 +234,20 @@ export const NOTE_NAME_OPTIONS: PitchClass[] = [
   'B',
 ]
 
+export const NATURAL_PITCH_CLASSES: PitchClass[] = [
+  'C',
+  'D',
+  'E',
+  'F',
+  'G',
+  'A',
+  'B',
+]
+
+export const TREBLE_SCOPE_C_MAJOR_NOTES = TREBLE_SCOPE_NOTES.filter((note) =>
+  NATURAL_PITCH_CLASSES.includes(note.name),
+)
+
 export const TREBLE_OCTAVE_OPTIONS = Array.from(
   new Set(TREBLE_SCOPE_NOTES.map((note) => note.octave)),
 ).sort((a, b) => a - b)
