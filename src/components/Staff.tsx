@@ -11,6 +11,9 @@ const VIEWBOX_HEIGHT = 200
 const MARGIN_Y = 48
 const NOTE_X = 150
 const CLEF_X = 54
+const CLEF_Y =
+  MARGIN_Y + (STAFF_LINE_GAP * (STAFF_LINES - 1)) / 2 /* staff vertical midpoint */
+const TREBLE_CLEF_GLYPH = String.fromCodePoint(0x1d11e)
 
 type StaffProps = {
   note: Note
@@ -71,7 +74,16 @@ const Staff = memo(({ note, 'aria-label': ariaLabel }: StaffProps) => {
           )
         })}
 
-        <path className={styles.clef} d={buildTrebleClefPath(CLEF_X)} />
+        <text
+          className={styles.clef}
+          x={CLEF_X}
+          y={CLEF_Y}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          aria-hidden="true"
+        >
+          {TREBLE_CLEF_GLYPH}
+        </text>
 
         {ledgerLines.map((step) => {
           const bottomLine =
@@ -93,13 +105,11 @@ const Staff = memo(({ note, 'aria-label': ariaLabel }: StaffProps) => {
           <Accidental type={accidental} y={yPosition} />
         ) : null}
 
-        <ellipse
+        <circle
           cx={NOTE_X}
           cy={yPosition}
-          rx={10}
-          ry={7.6}
+          r={10}
           className={styles.noteHead}
-          transform={`rotate(-18 ${NOTE_X} ${yPosition})`}
         />
       </svg>
     </figure>
@@ -107,69 +117,6 @@ const Staff = memo(({ note, 'aria-label': ariaLabel }: StaffProps) => {
 })
 
 Staff.displayName = 'Staff'
-
-function buildTrebleClefPath(centerX: number): string {
-  const x = centerX
-  const upperAnchor = MARGIN_Y - 36
-  const lowerLoop = MARGIN_Y + 58
-  const tailStart = MARGIN_Y + 108
-  const tailEnd = MARGIN_Y + 164
-
-  return [
-    `M ${x - 10} ${upperAnchor}`,
-    `C ${x - 62} ${upperAnchor - 60}, ${x + 52} ${upperAnchor - 70}, ${x + 22} ${
-      MARGIN_Y - 4
-    }`,
-    `C ${x - 6} ${MARGIN_Y + 32}, ${x - 56} ${MARGIN_Y + 10}, ${x - 42} ${
-      MARGIN_Y + 60
-    }`,
-    `C ${x - 26} ${MARGIN_Y + 122}, ${x + 44} ${MARGIN_Y + 126}, ${x + 36} ${
-      lowerLoop
-    }`,
-    `C ${x + 30} ${MARGIN_Y + 6}, ${x - 20} ${MARGIN_Y + 2}, ${x - 22} ${
-      MARGIN_Y + 52
-    }`,
-    `C ${x - 24} ${MARGIN_Y + 98}, ${x + 28} ${MARGIN_Y + 104}, ${x + 26} ${
-      MARGIN_Y + 52
-    }`,
-    `C ${x + 24} ${MARGIN_Y + 16}, ${x - 6} ${MARGIN_Y + 14}, ${x - 8} ${
-      MARGIN_Y + 44
-    }`,
-    `C ${x - 10} ${MARGIN_Y + 74}, ${x + 24} ${MARGIN_Y + 76}, ${x + 24} ${
-      MARGIN_Y + 44
-    }`,
-    `C ${x + 24} ${MARGIN_Y + 12}, ${x - 28} ${MARGIN_Y + 16}, ${x - 28} ${
-      MARGIN_Y + 70
-    }`,
-    `C ${x - 28} ${tailStart + 40}, ${x + 40} ${tailStart + 40}, ${x + 38} ${
-      tailStart - 6
-    }`,
-    `C ${x + 36} ${tailStart - 60}, ${x - 12} ${tailStart - 66}, ${x - 12} ${
-      tailStart - 18
-    }`,
-    `C ${x - 12} ${tailStart + 32}, ${x + 34} ${tailStart + 30}, ${x + 34} ${
-      tailStart - 12
-    }`,
-    `C ${x + 34} ${tailStart - 48}, ${x + 6} ${tailStart - 48}, ${x + 4} ${
-      tailStart - 18
-    }`,
-    `C ${x + 2} ${tailStart + 20}, ${x + 40} ${tailStart + 20}, ${x + 40} ${
-      tailStart - 22
-    }`,
-    `C ${x + 40} ${tailStart - 56}, ${x + 14} ${tailStart - 58}, ${x + 12} ${
-      tailStart - 34
-    }`,
-    `C ${x + 10} ${tailStart - 2}, ${x + 46} ${tailStart + 2}, ${x + 46} ${
-      tailEnd - 36
-    }`,
-    `C ${x + 46} ${tailEnd - 74}, ${x + 12} ${tailEnd - 78}, ${x + 12} ${
-      tailEnd - 42
-    }`,
-    `C ${x + 12} ${tailEnd - 6}, ${x + 48} ${tailEnd - 6}, ${x + 48} ${
-      tailEnd - 40
-    }`,
-  ].join(' ')
-}
 
 type AccidentalProps = {
   type: 'sharp' | 'flat'

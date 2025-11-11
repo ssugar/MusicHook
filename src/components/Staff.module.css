@@ -21,20 +21,21 @@
 
 .noteHead {
   fill: var(--accent-strong);
-  stroke: var(--accent-strong);
-  stroke-width: 1.4;
-  transform: rotate(-18deg);
-  transform-origin: center;
-  transform-box: fill-box;
-  transition: transform 0.25s ease;
+  opacity: 0.25;
 }
 
 .clef {
-  fill: none;
-  stroke: var(--text-secondary);
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  fill: var(--text-secondary);
+  font-family:
+    'Bravura',
+    'Noto Music',
+    'Petaluma',
+    'Sebastian',
+    'Segoe UI Symbol',
+    'Apple Symbols',
+    'Arial Unicode MS',
+    serif;
+  font-size: 132px;
 }
 
 .accidental {
