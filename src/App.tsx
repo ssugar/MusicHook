@@ -3,6 +3,7 @@ import { NavLink, Route, Routes, Navigate } from 'react-router-dom'
 import styles from './App.module.css'
 import TrebleTrainer from './components/TrebleTrainer'
 import GuitarTrainer from './components/GuitarTrainer'
+import UkuleleTrainer from './components/UkuleleTrainer'
 
 type ThemeMode = 'light' | 'dark' | 'high-contrast'
 
@@ -49,6 +50,7 @@ function App() {
     () => [
       { to: '/treble', label: 'Treble Trainer' },
       { to: '/guitar', label: 'Guitar Trainer' },
+      { to: '/ukulele', label: 'Ukulele Trainer' },
     ],
     [],
   )
@@ -100,6 +102,7 @@ function App() {
           <Route path="/" element={<Navigate to="/treble" replace />} />
           <Route path="/treble" element={<TrebleTrainer />} />
           <Route path="/guitar" element={<GuitarTrainer />} />
+          <Route path="/ukulele" element={<UkuleleTrainer />} />
           <Route path="*" element={<Navigate to="/treble" replace />} />
         </Routes>
       </main>

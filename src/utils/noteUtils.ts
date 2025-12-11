@@ -27,7 +27,13 @@ export type Note = {
   octave: number
 }
 
-export type GuitarPosition = { string: 1 | 2 | 3 | 4 | 5 | 6; fret: number }
+export type FretPosition<TString extends number = number> = {
+  string: TString
+  fret: number
+}
+
+export type GuitarPosition = FretPosition<1 | 2 | 3 | 4 | 5 | 6>
+export type UkulelePosition = FretPosition<1 | 2 | 3 | 4>
 
 const PITCH_TO_SEMITONE: Record<PitchClass, number> = {
   C: 0,
@@ -107,6 +113,13 @@ export const GUITAR_TUNING: Record<GuitarPosition['string'], Note> = {
   6: { name: 'E', octave: 2 },
 }
 
+export const UKULELE_TUNING: Record<UkulelePosition['string'], Note> = {
+  1: { name: 'A', octave: 4 },
+  2: { name: 'E', octave: 4 },
+  3: { name: 'C', octave: 4 },
+  4: { name: 'G', octave: 4 },
+}
+
 const TREBLE_MIN = { name: 'C', octave: 4 } satisfies Note
 const TREBLE_MAX = { name: 'B', octave: 5 } satisfies Note
 
@@ -158,19 +171,7 @@ export function trebleYPosition(note: Note): number {
  * Standard-tuned guitar (E2–E4) fretboard mapping for notes up to fret 12.
  */
 export function guitarPositions(note: Note): GuitarPosition[] {
-  const midi = toMidi(note)
-  const positions: GuitarPosition[] = []
-  for (const stringKey of Object.keys(GUITAR_TUNING)) {
-    const numericString = Number.parseInt(stringKey, 10) as GuitarPosition['string']
-    const openMidi = toMidi(GUITAR_TUNING[numericString])
-    const fret = midi - openMidi
-    if (fret >= 0 && fret <= 12) {
-      positions.push({ string: numericString, fret })
-    }
-  }
-  return positions.sort((a, b) =>
-    a.string === b.string ? a.fret - b.fret : a.string - b.string,
-  )
+  return instrumentPositions(note, GUITAR_TUNING)
 }
 
 /**
@@ -197,22 +198,9 @@ export const TREBLE_SCOPE_NOTES = generateRange(TREBLE_MIN, TREBLE_MAX)
 /**
  * Complete set of notes playable on a standard guitar within 0–12 frets.
  */
-export const GUITAR_SCOPE_NOTES = (() => {
-  const set = new Map<number, Note>()
-  for (const stringKey of Object.keys(GUITAR_TUNING)) {
-    const numericString = Number.parseInt(stringKey, 10) as GuitarPosition['string']
-    const open = toMidi(GUITAR_TUNING[numericString])
-    for (let fret = 0; fret <= 12; fret += 1) {
-      const midi = open + fret
-      if (!set.has(midi)) {
-        const octave = Math.floor(midi / 12) - 1
-        const semitone = midi % 12
-        set.set(midi, { name: CANONICAL_SHARPS[semitone], octave })
-      }
-    }
-  }
-  return Array.from(set.values()).sort((a, b) => toMidi(a) - toMidi(b))
-})()
+export const GUITAR_SCOPE_NOTES = createInstrumentScope(GUITAR_TUNING)
+
+export const UKULELE_SCOPE_NOTES = createInstrumentScope(UKULELE_TUNING)
 
 export const NOTE_NAME_OPTIONS: PitchClass[] = [
   'C',
@@ -306,8 +294,64 @@ export function toEnharmonicFlat(note: Note): Note {
 }
 
 export function noteAtGuitarPosition(position: GuitarPosition): Note {
-  const tuning = GUITAR_TUNING[position.string]
-  const midi = toMidi(tuning) + position.fret
+  return noteAtInstrumentPosition(GUITAR_TUNING, position)
+}
+
+export function guitarPositionsForPitchClass(pitch: PitchClass): GuitarPosition[] {
+  return positionsForPitchClass(GUITAR_TUNING, pitch)
+}
+
+export function noteAtUkulelePosition(position: UkulelePosition): Note {
+  return noteAtInstrumentPosition(UKULELE_TUNING, position)
+}
+
+export function ukulelePositionsForPitchClass(pitch: PitchClass): UkulelePosition[] {
+  return positionsForPitchClass(UKULELE_TUNING, pitch)
+}
+
+function instrumentPositions<TString extends number>(
+  note: Note,
+  tuning: Record<TString, Note>,
+): FretPosition<TString>[] {
+  const midi = toMidi(note)
+  const positions: FretPosition<TString>[] = []
+  for (const stringKey of Object.keys(tuning)) {
+    const numericString = Number.parseInt(stringKey, 10) as TString
+    const openMidi = toMidi(tuning[numericString])
+    const fret = midi - openMidi
+    if (fret >= 0 && fret <= 12) {
+      positions.push({ string: numericString, fret })
+    }
+  }
+  return positions.sort((a, b) =>
+    a.string === b.string ? a.fret - b.fret : a.string - b.string,
+  )
+}
+
+function createInstrumentScope<TString extends number>(
+  tuning: Record<TString, Note>,
+): Note[] {
+  const set = new Map<number, Note>()
+  for (const stringKey of Object.keys(tuning)) {
+    const numericString = Number.parseInt(stringKey, 10) as TString
+    const open = toMidi(tuning[numericString])
+    for (let fret = 0; fret <= 12; fret += 1) {
+      const midi = open + fret
+      if (!set.has(midi)) {
+        const octave = Math.floor(midi / 12) - 1
+        const semitone = midi % 12
+        set.set(midi, { name: CANONICAL_SHARPS[semitone], octave })
+      }
+    }
+  }
+  return Array.from(set.values()).sort((a, b) => toMidi(a) - toMidi(b))
+}
+
+function noteAtInstrumentPosition<TString extends number>(
+  tuning: Record<TString, Note>,
+  position: FretPosition<TString>,
+): Note {
+  const midi = toMidi(tuning[position.string]) + position.fret
   const semitone = midi % 12
   return {
     name: CANONICAL_SHARPS[semitone],
@@ -315,14 +359,17 @@ export function noteAtGuitarPosition(position: GuitarPosition): Note {
   }
 }
 
-export function guitarPositionsForPitchClass(pitch: PitchClass): GuitarPosition[] {
+function positionsForPitchClass<TString extends number>(
+  tuning: Record<TString, Note>,
+  pitch: PitchClass,
+): FretPosition<TString>[] {
   const canonicalName = CANONICAL_SHARPS[PITCH_TO_SEMITONE[pitch]]
-  const positions: GuitarPosition[] = []
-  for (const stringKey of Object.keys(GUITAR_TUNING)) {
-    const numericString = Number.parseInt(stringKey, 10) as GuitarPosition['string']
+  const positions: FretPosition<TString>[] = []
+  for (const stringKey of Object.keys(tuning)) {
+    const numericString = Number.parseInt(stringKey, 10) as TString
     for (let fret = 0; fret <= 12; fret += 1) {
       const noteName = toCanonical(
-        noteAtGuitarPosition({ string: numericString, fret }),
+        noteAtInstrumentPosition(tuning, { string: numericString, fret }),
       ).name
       if (noteName === canonicalName) {
         positions.push({ string: numericString, fret })

@@ -3,14 +3,14 @@ import Controls from './Controls'
 import Fretboard from './Fretboard'
 import styles from './InstrumentTrainer.module.css'
 import {
-  GUITAR_SCOPE_NOTES,
-  GUITAR_TUNING,
-  guitarPositionsForPitchClass,
-  noteAtGuitarPosition,
+  UKULELE_SCOPE_NOTES,
+  UKULELE_TUNING,
+  ukulelePositionsForPitchClass,
+  noteAtUkulelePosition,
   toCanonical,
-  type GuitarPosition,
-  type PitchClass,
   type Note,
+  type PitchClass,
+  type UkulelePosition,
 } from '../utils/noteUtils'
 import { useDrill, type DrillSubmissionResult } from '../hooks/useDrill'
 
@@ -20,27 +20,28 @@ type FeedbackState =
   | { status: 'incorrect'; message: string }
   | { status: 'warn'; message: string }
 
-type GuitarTrainerProps = {
+type UkuleleTrainerProps = {
   seed?: number
 }
 
-type TrainerNote = Note & { requiredPosition?: GuitarPosition }
+type TrainerNote = Note & { requiredPosition?: UkulelePosition }
+type UkuleleDrillResult = DrillSubmissionResult & {
+  allUkulelePositions?: UkulelePosition[]
+}
 
-const DEFAULT_POSITION: GuitarPosition = { string: 6, fret: 0 }
+const DEFAULT_POSITION: UkulelePosition = { string: 4, fret: 0 }
 const MAX_HISTORY = 4
 
-const STRING_LABELS: Record<GuitarPosition['string'], string> = {
-  1: 'high E',
-  2: 'B',
-  3: 'G',
-  4: 'D',
-  5: 'A',
-  6: 'low E',
+const STRING_LABELS: Record<UkulelePosition['string'], string> = {
+  1: 'A',
+  2: 'E',
+  3: 'C',
+  4: 'G',
 }
 
 const EASY_POOL: TrainerNote[] = (() => {
   const unique = new Map<PitchClass, Note>()
-  GUITAR_SCOPE_NOTES.forEach((note) => {
+  UKULELE_SCOPE_NOTES.forEach((note) => {
     const canonical = toCanonical(note)
     if (!unique.has(canonical.name)) {
       unique.set(canonical.name, canonical)
@@ -51,12 +52,12 @@ const EASY_POOL: TrainerNote[] = (() => {
 
 const HARD_POOL: TrainerNote[] = (() => {
   const entries: TrainerNote[] = []
-  for (const stringKey of Object.keys(GUITAR_TUNING)) {
-    const stringNumber = Number.parseInt(stringKey, 10) as GuitarPosition['string']
+  for (const stringKey of Object.keys(UKULELE_TUNING)) {
+    const stringNumber = Number.parseInt(stringKey, 10) as UkulelePosition['string']
     const seen = new Set<PitchClass>()
     for (let fret = 0; fret <= 12; fret += 1) {
       const note = toCanonical(
-        noteAtGuitarPosition({ string: stringNumber, fret }),
+        noteAtUkulelePosition({ string: stringNumber, fret }),
       )
       const pitch = note.name as PitchClass
       if (!seen.has(pitch)) {
@@ -72,21 +73,21 @@ const HARD_POOL: TrainerNote[] = (() => {
   return entries
 })()
 
-const GuitarTrainer = ({ seed }: GuitarTrainerProps = {}) => {
+const UkuleleTrainer = ({ seed }: UkuleleTrainerProps = {}) => {
   const [selectedPosition, setSelectedPosition] =
-    useState<GuitarPosition | null>(null)
+    useState<UkulelePosition | null>(null)
   const [isHard, setIsHard] = useState(false)
   const [feedback, setFeedback] = useState<FeedbackState>({ status: 'idle' })
-  const [revealedPositions, setRevealedPositions] = useState<GuitarPosition[]>([])
+  const [revealedPositions, setRevealedPositions] = useState<UkulelePosition[]>([])
   const [usedPositions, setUsedPositions] = useState<
-    Record<PitchClass, GuitarPosition[]>
-  >({} as Record<PitchClass, GuitarPosition[]>)
+    Record<PitchClass, UkulelePosition[]>
+  >({} as Record<PitchClass, UkulelePosition[]>)
 
   const currentPool = isHard ? HARD_POOL : EASY_POOL
 
   const drill = useDrill<
-    GuitarPosition,
-    DrillSubmissionResult,
+    UkulelePosition,
+    UkuleleDrillResult,
     TrainerNote
   >({
     pool: currentPool,
@@ -96,7 +97,7 @@ const GuitarTrainer = ({ seed }: GuitarTrainerProps = {}) => {
       const requiredPosition = target.requiredPosition
       const positions = requiredPosition
         ? [requiredPosition]
-        : guitarPositionsForPitchClass(canonicalTarget.name as PitchClass)
+        : ukulelePositionsForPitchClass(canonicalTarget.name as PitchClass)
       const correct = positions.some(
         (position) =>
           position.string === answer.string && position.fret === answer.fret,
@@ -104,7 +105,7 @@ const GuitarTrainer = ({ seed }: GuitarTrainerProps = {}) => {
       return {
         correct,
         canonical: canonicalTarget,
-        allGuitarPositions: positions,
+        allUkulelePositions: positions,
       }
     },
   })
@@ -137,7 +138,7 @@ const GuitarTrainer = ({ seed }: GuitarTrainerProps = {}) => {
   }, [targetCanonical])
 
   useEffect(() => {
-    setUsedPositions({} as Record<PitchClass, GuitarPosition[]>)
+    setUsedPositions({} as Record<PitchClass, UkulelePosition[]>)
     setSelectedPosition(null)
     setFeedback({ status: 'idle' })
     setRevealedPositions([])
@@ -145,7 +146,7 @@ const GuitarTrainer = ({ seed }: GuitarTrainerProps = {}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isHard])
 
-  const handleSelect = (position: GuitarPosition) => {
+  const handleSelect = (position: UkulelePosition) => {
     if (
       isHard &&
       requiredPosition &&
@@ -179,7 +180,7 @@ const GuitarTrainer = ({ seed }: GuitarTrainerProps = {}) => {
     const chosenPosition = selectedPosition
     const result = drill.submitAnswer(selectedPosition)
 
-    setRevealedPositions(result.allGuitarPositions ?? [])
+    setRevealedPositions(result.allUkulelePositions ?? [])
 
     if (result.correct && !isHard) {
       setFeedback({
@@ -225,7 +226,7 @@ const GuitarTrainer = ({ seed }: GuitarTrainerProps = {}) => {
       return
     }
 
-    const expectedDisplay = (result.allGuitarPositions ?? [])
+    const expectedDisplay = (result.allUkulelePositions ?? [])
       .map((position) => `S${position.string}/F${position.fret}`)
       .join(', ')
     setFeedback({
@@ -246,10 +247,10 @@ const GuitarTrainer = ({ seed }: GuitarTrainerProps = {}) => {
       const current = previous ?? DEFAULT_POSITION
       let nextString = current.string + delta.stringDelta
       let nextFret = current.fret + delta.fretDelta
-      nextString = Math.max(1, Math.min(6, nextString))
+      nextString = Math.max(1, Math.min(4, nextString))
       nextFret = Math.max(0, Math.min(12, nextFret))
       const candidate = {
-        string: nextString as GuitarPosition['string'],
+        string: nextString as UkulelePosition['string'],
         fret: nextFret,
       }
       if (
@@ -271,7 +272,7 @@ const GuitarTrainer = ({ seed }: GuitarTrainerProps = {}) => {
   }
 
   const selectedNote = selectedPosition
-    ? noteAtGuitarPosition(selectedPosition)
+    ? noteAtUkulelePosition(selectedPosition)
     : null
 
   const feedbackMessage =
@@ -288,8 +289,8 @@ const GuitarTrainer = ({ seed }: GuitarTrainerProps = {}) => {
       data-pitch={targetCanonical.name}
     >
       <div className={styles.sidebar}>
-        <h2 className={styles.heading}>Guitar Fretboard Trainer</h2>
-        <p className={styles.targetLabel} id="guitar-target">
+        <h2 className={styles.heading}>Ukulele Fretboard Trainer</h2>
+        <p className={styles.targetLabel} id="ukulele-target">
           {requiredPosition
             ? `Find: ${targetCanonical.name} on the ${STRING_LABELS[requiredPosition.string]} string`
             : `Find: ${targetCanonical.name}`}
@@ -350,21 +351,21 @@ const GuitarTrainer = ({ seed }: GuitarTrainerProps = {}) => {
         onResetTimed={drill.resetTimed}
       >
         <Fretboard
-          mode="guitar"
+          mode="ukulele"
           activePosition={selectedPosition ?? undefined}
           highlightedPositions={revealedPositions}
           disabledPositions={disabledPositions}
-          onSelect={(position) => handleSelect(position as GuitarPosition)}
+          onSelect={(position) => handleSelect(position as UkulelePosition)}
           onNavigate={handleNavigate}
-          labelledBy="guitar-target"
+          labelledBy="ukulele-target"
         />
       </Controls>
     </div>
   )
 }
 
-export default GuitarTrainer
+export default UkuleleTrainer
 
-function positionKeyString(position: GuitarPosition): string {
+function positionKeyString(position: UkulelePosition): string {
   return `${position.string}-${position.fret}`
 }

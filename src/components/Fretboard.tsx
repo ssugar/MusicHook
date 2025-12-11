@@ -1,10 +1,11 @@
 import { useMemo } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
-import type { GuitarPosition } from '../utils/noteUtils'
+import type { GuitarPosition, UkulelePosition } from '../utils/noteUtils'
 import styles from './Fretboard.module.css'
 
-const STRINGS: GuitarPosition['string'][] = [1, 2, 3, 4, 5, 6]
-const STRING_LABELS: Record<GuitarPosition['string'], string> = {
+const GUITAR_STRINGS: GuitarPosition['string'][] = [1, 2, 3, 4, 5, 6]
+const UKULELE_STRINGS: UkulelePosition['string'][] = [1, 2, 3, 4]
+const GUITAR_LABELS: Record<GuitarPosition['string'], string> = {
   1: 'E',
   2: 'B',
   3: 'G',
@@ -12,27 +13,38 @@ const STRING_LABELS: Record<GuitarPosition['string'], string> = {
   5: 'A',
   6: 'E',
 }
+const UKULELE_LABELS: Record<UkulelePosition['string'], string> = {
+  1: 'A',
+  2: 'E',
+  3: 'C',
+  4: 'G',
+}
 const FRETS = Array.from({ length: 12 }, (_, index) => index + 1)
 const MARKER_FRETS = [3, 5, 7, 9, 12]
 const CELL_WIDTH = 55
+const STRING_SPACING = 40
 const BOARD_TOP = 40
-const BOARD_HEIGHT = 240
 const BOARD_START_X = 70
 const BOARD_WIDTH = CELL_WIDTH * FRETS.length
 const BOARD_END_X = BOARD_START_X + BOARD_WIDTH
 const OPEN_X = BOARD_START_X - 28
 const LABEL_X = OPEN_X - 20
+const VIEWBOX_PADDING = 60
+
+type InstrumentPosition = GuitarPosition | UkulelePosition
 
 type FretboardProps = {
-  activePosition?: GuitarPosition | null
-  highlightedPositions?: GuitarPosition[]
-  disabledPositions?: GuitarPosition[]
-  onSelect: (position: GuitarPosition) => void
+  mode: 'guitar' | 'ukulele'
+  activePosition?: InstrumentPosition | null
+  highlightedPositions?: InstrumentPosition[]
+  disabledPositions?: InstrumentPosition[]
+  onSelect: (position: InstrumentPosition) => void
   onNavigate?: (delta: { stringDelta: number; fretDelta: number }) => void
   labelledBy?: string
 }
 
 function Fretboard({
+  mode,
   activePosition,
   highlightedPositions = [],
   disabledPositions = [],
@@ -40,6 +52,21 @@ function Fretboard({
   onNavigate,
   labelledBy,
 }: FretboardProps) {
+  const strings = mode === 'guitar' ? GUITAR_STRINGS : UKULELE_STRINGS
+  const boardHeight = strings.length * STRING_SPACING
+  const boardBottomY = BOARD_TOP + boardHeight
+  const markerPrimaryOffset = boardHeight / 3
+  const markerSecondaryOffset = (boardHeight * 2) / 3
+  const markerEdgeOffset = boardHeight / 6
+  const viewBoxHeight = BOARD_TOP + boardHeight + VIEWBOX_PADDING
+  const stringLabels = useMemo(
+    () =>
+      (mode === 'guitar' ? GUITAR_LABELS : UKULELE_LABELS) as Record<
+        number,
+        string
+      >,
+    [mode],
+  )
   const highlightedKey = useMemo(
     () =>
       new Set(
@@ -99,7 +126,7 @@ function Fretboard({
     <div className={styles.fretboardWrapper}>
       <svg
         className={styles.fretboard}
-        viewBox={`0 0 ${BOARD_END_X + 90} 340`}
+        viewBox={`0 0 ${BOARD_END_X + 90} ${viewBoxHeight}`}
         role="application"
         tabIndex={0}
         aria-labelledby={labelledBy}
@@ -109,7 +136,7 @@ function Fretboard({
           x={BOARD_START_X}
           y={BOARD_TOP}
           width={BOARD_WIDTH}
-          height={BOARD_HEIGHT}
+          height={boardHeight}
           rx={16}
           className={styles.body}
         />
@@ -117,11 +144,11 @@ function Fretboard({
           x1={BOARD_START_X}
           y1={BOARD_TOP}
           x2={BOARD_START_X}
-          y2={BOARD_TOP + BOARD_HEIGHT}
+          y2={BOARD_TOP + boardHeight}
           className={styles.nut}
         />
-        {STRINGS.map((string, index) => {
-          const y = BOARD_TOP + 20 + index * 40
+        {strings.map((string, index) => {
+          const y = BOARD_TOP + STRING_SPACING / 2 + index * STRING_SPACING
           return (
             <line
               key={`string-${string}`}
@@ -133,8 +160,8 @@ function Fretboard({
             />
           )
         })}
-        {STRINGS.map((string, index) => {
-          const y = BOARD_TOP + 20 + index * 40
+        {strings.map((string, index) => {
+          const y = BOARD_TOP + STRING_SPACING / 2 + index * STRING_SPACING
           return (
             <text
               key={`label-${string}`}
@@ -142,7 +169,7 @@ function Fretboard({
               y={y}
               className={styles.stringLabel}
             >
-              {STRING_LABELS[string]}
+              {stringLabels[string] ?? ''}
             </text>
           )
         })}
@@ -154,7 +181,7 @@ function Fretboard({
               x1={x}
               y1={BOARD_TOP}
               x2={x}
-              y2={BOARD_TOP + BOARD_HEIGHT}
+              y2={BOARD_TOP + boardHeight}
               className={styles.fretLine}
             />
           )
@@ -166,13 +193,13 @@ function Fretboard({
             <g key={`marker-${fret}`}>
               <circle
                 cx={x}
-                cy={BOARD_TOP + 80}
+                cy={BOARD_TOP + markerPrimaryOffset}
                 r={6}
                 className={styles.fretMarker}
               />
               <circle
                 cx={x}
-                cy={BOARD_TOP + 160}
+                cy={BOARD_TOP + markerSecondaryOffset}
                 r={6}
                 className={styles.fretMarker}
               />
@@ -180,13 +207,13 @@ function Fretboard({
                 <>
                   <circle
                     cx={x}
-                    cy={BOARD_TOP + 40}
+                    cy={BOARD_TOP + markerEdgeOffset}
                     r={6}
                     className={styles.fretMarker}
                   />
                   <circle
                     cx={x}
-                    cy={BOARD_TOP + 200}
+                    cy={BOARD_TOP + boardHeight - markerEdgeOffset}
                     r={6}
                     className={styles.fretMarker}
                   />
@@ -195,9 +222,9 @@ function Fretboard({
             </g>
           )
         })}
-        {STRINGS.map((string, stringIndex) => {
-          const y = BOARD_TOP + stringIndex * 40
-          const centerY = y + 20
+        {strings.map((string, stringIndex) => {
+          const y = BOARD_TOP + stringIndex * STRING_SPACING
+          const centerY = y + STRING_SPACING / 2
           const openKey = positionKey(string, 0)
           const isOpenDisabled = disabledKey.has(openKey)
           const isOpenActive =
@@ -262,10 +289,10 @@ function Fretboard({
             </g>
           )
         })}
-        {STRINGS.map((string, stringIndex) =>
+        {strings.map((string, stringIndex) =>
           FRETS.map((fret) => {
             const x = BOARD_START_X + (fret - 1) * CELL_WIDTH
-            const y = BOARD_TOP + stringIndex * 40
+            const y = BOARD_TOP + stringIndex * STRING_SPACING
             const key = positionKey(string, fret)
             const isDisabled = disabledKey.has(key)
             const isActive =
@@ -298,7 +325,7 @@ function Fretboard({
                   x={x}
                   y={y}
                   width={CELL_WIDTH}
-                  height={40}
+                  height={STRING_SPACING}
                   role="button"
                   tabIndex={-1}
                   data-highlighted={isHighlighted ? 'true' : undefined}
@@ -316,7 +343,7 @@ function Fretboard({
                 {isActive ? (
                   <circle
                     cx={x + CELL_WIDTH / 2}
-                    cy={y + 20}
+                    cy={y + STRING_SPACING / 2}
                     r={10}
                     className={styles.selection}
                   />
@@ -324,7 +351,7 @@ function Fretboard({
                 {isHighlighted && !isActive ? (
                   <circle
                     cx={x + CELL_WIDTH / 2}
-                    cy={y + 20}
+                    cy={y + STRING_SPACING / 2}
                     r={8}
                     className={styles.highlightDot}
                   />
@@ -335,17 +362,17 @@ function Fretboard({
         )}
         <g aria-hidden="true">
           {FRETS.map((fret) => {
-            const x = BOARD_START_X + (fret - 1) * CELL_WIDTH
-            return (
-              <text
-                key={`label-${fret}`}
-                x={x + CELL_WIDTH / 2}
-                y={BOARD_TOP + BOARD_HEIGHT + 30}
-                className={styles.fretLabel}
-              >
-                {fret}
-              </text>
-            )
+          const x = BOARD_START_X + (fret - 1) * CELL_WIDTH
+          return (
+            <text
+              key={`label-${fret}`}
+              x={x + CELL_WIDTH / 2}
+              y={BOARD_TOP + boardHeight + 30}
+              className={styles.fretLabel}
+            >
+              {fret}
+            </text>
+          )
           })}
         </g>
       </svg>

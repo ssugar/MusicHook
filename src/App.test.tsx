@@ -9,7 +9,7 @@ describe('App routing', () => {
     cleanup()
   })
 
-  it('renders treble trainer by default and navigates to guitar trainer', async () => {
+  it('renders treble trainer by default and navigates to other trainers', async () => {
     render(
       <MemoryRouter initialEntries={['/treble']}>
         <App />
@@ -22,6 +22,11 @@ describe('App routing', () => {
     await userEvent.click(screen.getByRole('link', { name: /Guitar Trainer/i }))
     expect(
       await screen.findByRole('heading', { name: /Guitar Fretboard Trainer/i }),
+    ).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('link', { name: /Ukulele Trainer/i }))
+    expect(
+      await screen.findByRole('heading', { name: /Ukulele Fretboard Trainer/i }),
     ).toBeInTheDocument()
   })
 
