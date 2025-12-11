@@ -1,7 +1,31 @@
 import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import TrebleTrainer from './TrebleTrainer'
+
+vi.mock('../context/AuthContext', () => ({
+  useAuth: () => ({
+    user: { uid: 'test-user', email: 'test@example.com' },
+    initializing: false,
+    signIn: vi.fn(),
+    register: vi.fn(),
+    signOut: vi.fn(),
+  }),
+}))
+
+vi.mock('../hooks/useTrainerProgress', () => ({
+  useTrainerProgress: () => ({
+    progress: {
+      totalAttempts: 0,
+      totalCorrect: 0,
+      bestStreak: 0,
+      lastUpdated: null,
+    },
+    loading: false,
+    error: null,
+    recordResult: vi.fn(),
+  }),
+}))
 
 function readTargetLetter() {
   const staffFigure = screen.getByRole('img', {

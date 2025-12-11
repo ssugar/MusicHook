@@ -5,7 +5,7 @@ MusicHook is a browser-based music drill SPA built with React + TypeScript. It p
 - **Treble Clef Trainer** – identify notes from C4 through B5 on a rendered treble staff.
 - **Guitar Fretboard Trainer** – in Easy mode locate every occurrence of a requested pitch class on the standard‑tuned 6‑string fretboard (open strings plus frets 1–12); flip on Hard mode to target a specific string.
 
-Everything runs client-side. No persistence, telemetry, or external calls are used so the app can be embedded in secure classroom environments.
+Progress, streaks, and missions now persist via Firebase (Spark plan) so family members can sign in from GitHub Pages and resume drills without running their own backend.
 
 ## Tech Stack
 
@@ -29,6 +29,26 @@ npm run lint       # lint all TypeScript/TSX files
 npm run format     # format the project with Prettier
 npm run typecheck  # run TypeScript in --noEmit mode
 ```
+
+## Firebase Setup
+
+1. In the Firebase console create a Web app and copy the config snippet. Paste those values into `src/firebase/config.ts`.
+2. Enable **Authentication → Email/Password** and **Cloud Firestore**. Apply the production rules below so each child only sees their own data:
+
+   ```text
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       match /users/{userId}/{document=**} {
+         allow read, write: if request.auth != null && request.auth.uid == userId;
+       }
+     }
+   }
+   ```
+
+3. (Optional) To run against the Firebase Emulator Suite, start the emulators and launch Vite with `VITE_FIREBASE_USE_EMULATORS=true npm run dev`. The SDK automatically connects to the Auth + Firestore emulators.
+
+Each signed-in user stores aggregated trainer stats at `users/{uid}/progress/{trainerId}` (trainerId is `treble`, `guitar`, or `ukulele`). Documents contain the cumulative attempts, correct count, best streak, and a `lastUpdated` timestamp.
 
 ## Project Structure
 

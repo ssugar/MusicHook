@@ -11,6 +11,8 @@ import {
 } from '../utils/noteUtils'
 import { useDrill, type DrillSubmissionResult } from '../hooks/useDrill'
 import { createSeededRandom } from '../utils/random'
+import { useTrainerProgress } from '../hooks/useTrainerProgress'
+import ProgressSummary from './ProgressSummary'
 
 type FeedbackState =
   | { status: 'idle' }
@@ -21,6 +23,8 @@ const TrebleTrainer = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<PitchClass | null>(null)
   const [feedback, setFeedback] = useState<FeedbackState>({ status: 'idle' })
   const rng = useMemo(() => createSeededRandom(Date.now()), [])
+  const { progress, loading, error, recordResult } =
+    useTrainerProgress('treble')
 
   const drill = useDrill<PitchClass, DrillSubmissionResult>({
     pool: TREBLE_SCOPE_C_MAJOR_NOTES,
@@ -58,6 +62,8 @@ const TrebleTrainer = () => {
       }
       setSelectedAnswer(choice)
       const result = drill.submitAnswer(choice)
+      const predictedStreak = result.correct ? drill.streak + 1 : 0
+      void recordResult({ correct: result.correct, streak: predictedStreak })
       if (result.correct) {
         setFeedback({
           status: 'correct',
@@ -70,7 +76,7 @@ const TrebleTrainer = () => {
         })
       }
     },
-    [drill, feedback.status],
+    [drill, feedback.status, recordResult],
   )
 
   const onNext = () => {
@@ -145,6 +151,13 @@ const TrebleTrainer = () => {
           {feedbackMessage || 'Select the correct note name.'}
         </div>
       </Controls>
+      <ProgressSummary
+        label="Saved progress"
+        progress={progress}
+        loading={loading}
+        error={error}
+        className={styles.progressPanel}
+      />
     </div>
   )
 }

@@ -13,6 +13,8 @@ import {
   type Note,
 } from '../utils/noteUtils'
 import { useDrill, type DrillSubmissionResult } from '../hooks/useDrill'
+import { useTrainerProgress } from '../hooks/useTrainerProgress'
+import ProgressSummary from './ProgressSummary'
 
 type FeedbackState =
   | { status: 'idle' }
@@ -83,6 +85,8 @@ const GuitarTrainer = ({ seed }: GuitarTrainerProps = {}) => {
   >({} as Record<PitchClass, GuitarPosition[]>)
 
   const currentPool = isHard ? HARD_POOL : EASY_POOL
+  const { progress, loading, error, recordResult } =
+    useTrainerProgress('guitar')
 
   const drill = useDrill<
     GuitarPosition,
@@ -178,6 +182,8 @@ const GuitarTrainer = ({ seed }: GuitarTrainerProps = {}) => {
     }
     const chosenPosition = selectedPosition
     const result = drill.submitAnswer(selectedPosition)
+    const predictedStreak = result.correct ? drill.streak + 1 : 0
+    void recordResult({ correct: result.correct, streak: predictedStreak })
 
     setRevealedPositions(result.allGuitarPositions ?? [])
 
@@ -359,6 +365,13 @@ const GuitarTrainer = ({ seed }: GuitarTrainerProps = {}) => {
           labelledBy="guitar-target"
         />
       </Controls>
+      <ProgressSummary
+        label="Guitar progress"
+        progress={progress}
+        loading={loading}
+        error={error}
+        className={styles.progressPanel}
+      />
     </div>
   )
 }

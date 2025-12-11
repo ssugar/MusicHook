@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Route, Routes, Navigate } from 'react-router-dom'
+import AuthScreen from './components/AuthScreen'
 import styles from './App.module.css'
 import TrebleTrainer from './components/TrebleTrainer'
 import GuitarTrainer from './components/GuitarTrainer'
 import UkuleleTrainer from './components/UkuleleTrainer'
+import { useAuth } from './context/AuthContext'
 
 type ThemeMode = 'light' | 'dark' | 'high-contrast'
 
@@ -36,6 +38,7 @@ const themeOptions: ThemeMode[] = ['light', 'dark', 'high-contrast']
 
 function App() {
   const [theme, setTheme] = useState<ThemeMode>(() => getStoredTheme())
+  const { user, initializing, signOut } = useAuth()
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -54,6 +57,18 @@ function App() {
     ],
     [],
   )
+
+  if (initializing) {
+    return (
+      <div className={styles.loadingState} role="status" aria-live="polite">
+        Loading your account…
+      </div>
+    )
+  }
+
+  if (!user) {
+    return <AuthScreen />
+  }
 
   return (
     <div className={styles.appShell}>
@@ -79,22 +94,34 @@ function App() {
             </NavLink>
           ))}
         </nav>
-        <div className={styles.themeControls}>
-          <label htmlFor="theme-select" className={styles.themeLabel}>
-            Theme
-          </label>
-          <select
-            id="theme-select"
-            className={styles.themeSelect}
-            value={theme}
-            onChange={(event) => setTheme(event.target.value as ThemeMode)}
-          >
-            {themeOptions.map((value) => (
-              <option value={value} key={value}>
-                {themeLabels[value]}
-              </option>
-            ))}
-          </select>
+        <div className={styles.rightControls}>
+          <div className={styles.themeControls}>
+            <label htmlFor="theme-select" className={styles.themeLabel}>
+              Theme
+            </label>
+            <select
+              id="theme-select"
+              className={styles.themeSelect}
+              value={theme}
+              onChange={(event) => setTheme(event.target.value as ThemeMode)}
+            >
+              {themeOptions.map((value) => (
+                <option value={value} key={value}>
+                  {themeLabels[value]}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className={styles.accountControls}>
+            <span className={styles.userEmail}>{user.email ?? 'Signed in'}</span>
+            <button
+              type="button"
+              className={styles.signOutButton}
+              onClick={() => signOut()}
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
       <main id="main" className={styles.main}>

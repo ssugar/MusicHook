@@ -13,6 +13,8 @@ import {
   type UkulelePosition,
 } from '../utils/noteUtils'
 import { useDrill, type DrillSubmissionResult } from '../hooks/useDrill'
+import { useTrainerProgress } from '../hooks/useTrainerProgress'
+import ProgressSummary from './ProgressSummary'
 
 type FeedbackState =
   | { status: 'idle' }
@@ -84,6 +86,8 @@ const UkuleleTrainer = ({ seed }: UkuleleTrainerProps = {}) => {
   >({} as Record<PitchClass, UkulelePosition[]>)
 
   const currentPool = isHard ? HARD_POOL : EASY_POOL
+  const { progress, loading, error, recordResult } =
+    useTrainerProgress('ukulele')
 
   const drill = useDrill<
     UkulelePosition,
@@ -179,6 +183,8 @@ const UkuleleTrainer = ({ seed }: UkuleleTrainerProps = {}) => {
     }
     const chosenPosition = selectedPosition
     const result = drill.submitAnswer(selectedPosition)
+    const predictedStreak = result.correct ? drill.streak + 1 : 0
+    void recordResult({ correct: result.correct, streak: predictedStreak })
 
     setRevealedPositions(result.allUkulelePositions ?? [])
 
@@ -360,6 +366,13 @@ const UkuleleTrainer = ({ seed }: UkuleleTrainerProps = {}) => {
           labelledBy="ukulele-target"
         />
       </Controls>
+      <ProgressSummary
+        label="Ukulele progress"
+        progress={progress}
+        loading={loading}
+        error={error}
+        className={styles.progressPanel}
+      />
     </div>
   )
 }

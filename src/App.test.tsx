@@ -1,8 +1,35 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
+
+vi.mock('./context/AuthContext', () => {
+  const mockAuth = {
+    user: { uid: 'test-user', email: 'test@example.com' },
+    initializing: false,
+    signIn: vi.fn(),
+    register: vi.fn(),
+    signOut: vi.fn(),
+  }
+  return {
+    useAuth: () => mockAuth,
+  }
+})
+
+vi.mock('./hooks/useTrainerProgress', () => ({
+  useTrainerProgress: () => ({
+    progress: {
+      totalAttempts: 0,
+      totalCorrect: 0,
+      bestStreak: 0,
+      lastUpdated: null,
+    },
+    loading: false,
+    error: null,
+    recordResult: vi.fn(),
+  }),
+}))
 
 describe('App routing', () => {
   afterEach(() => {

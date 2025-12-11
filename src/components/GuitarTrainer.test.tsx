@@ -1,12 +1,37 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import GuitarTrainer from './GuitarTrainer'
 import {
   guitarPositionsForPitchClass,
   type GuitarPosition,
   type PitchClass,
 } from '../utils/noteUtils'
+
+vi.mock('../context/AuthContext', () => ({
+  useAuth: () => ({
+    user: { uid: 'test-user', email: 'test@example.com' },
+    initializing: false,
+    signIn: vi.fn(),
+    register: vi.fn(),
+    signOut: vi.fn(),
+  }),
+}))
+
+vi.mock('../hooks/useTrainerProgress', () => ({
+  useTrainerProgress: () => ({
+    progress: {
+      totalAttempts: 0,
+      totalCorrect: 0,
+      bestStreak: 0,
+      lastUpdated: null,
+    },
+    loading: false,
+    error: null,
+    recordResult: vi.fn(),
+  }),
+}))
+
 const TEST_SEED = 2024
 
 function getTargetPitch(): PitchClass {

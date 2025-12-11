@@ -102,6 +102,10 @@
   color: var(--text-primary);
 }
 
+.progressPanel {
+  grid-column: 1 / -1;
+}
+
 @media (max-width: 920px) {
   .container {
     grid-template-columns: 1fr;
