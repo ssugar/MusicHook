@@ -54,7 +54,6 @@ function Fretboard({
 }: FretboardProps) {
   const strings = mode === 'guitar' ? GUITAR_STRINGS : UKULELE_STRINGS
   const boardHeight = strings.length * STRING_SPACING
-  const boardBottomY = BOARD_TOP + boardHeight
   const markerPrimaryOffset = boardHeight / 3
   const markerSecondaryOffset = (boardHeight * 2) / 3
   const markerEdgeOffset = boardHeight / 6
