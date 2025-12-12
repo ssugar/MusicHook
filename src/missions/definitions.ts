@@ -7,6 +7,8 @@ export type MissionId =
   | 'combo-sampler'
   | 'all-star-challenge'
 
+export type MissionRoute = '/treble' | '/guitar' | '/ukulele'
+
 export interface MissionContext {
   treble: TrainerProgress
   guitar: TrainerProgress
@@ -23,6 +25,7 @@ export interface MissionDefinition {
   id: MissionId
   title: string
   description: string
+  targetRoute: MissionRoute
   evaluate: (context: MissionContext) => MissionEvaluation
 }
 
@@ -36,23 +39,24 @@ const missions: MissionDefinition[] = [
     id: 'treble-accuracy',
     title: 'Treble Accuracy Sprint',
     description:
-      'Answer at least 20 treble-clef questions. Stars are awarded for accuracy: 70%, 85%, and 95%.',
+      'Answer 10 treble-clef questions to unlock stars. Accuracy tiers: 60%, 80%, and 95%.',
+    targetRoute: '/treble',
     evaluate: ({ treble }) => {
       const attempts = treble.totalAttempts
       const acc = accuracy(treble)
-      const requirementMet = attempts >= 20
+      const requirementMet = attempts >= 10
       let stars: 0 | 1 | 2 | 3 = 0
       if (requirementMet) {
         if (acc >= 0.95) stars = 3
-        else if (acc >= 0.85) stars = 2
-        else if (acc >= 0.7) stars = 1
+        else if (acc >= 0.8) stars = 2
+        else if (acc >= 0.6) stars = 1
       }
       return {
         requirementsMet: requirementMet,
         stars,
         detail: requirementMet
           ? `Attempts: ${attempts}, accuracy ${(acc * 100).toFixed(0)}%`
-          : 'Log 20 attempts in Treble Trainer to unlock stars.',
+          : 'Log 10 attempts in Treble Trainer to unlock stars.',
       }
     },
   },
@@ -60,13 +64,14 @@ const missions: MissionDefinition[] = [
     id: 'guitar-streak',
     title: 'Guitar Streak Hunter',
     description:
-      'Build long streaks on the guitar fretboard. Stars unlock at streaks of 5, 10, and 15.',
+      'Build streaks on the guitar fretboard. Stars unlock at streaks of 3, 6, and 10.',
+    targetRoute: '/guitar',
     evaluate: ({ guitar }) => {
-      const requirementMet = guitar.bestStreak >= 5
+      const requirementMet = guitar.bestStreak >= 3
       let stars: 0 | 1 | 2 | 3 = 0
       if (requirementMet) {
-        if (guitar.bestStreak >= 15) stars = 3
-        else if (guitar.bestStreak >= 10) stars = 2
+        if (guitar.bestStreak >= 10) stars = 3
+        else if (guitar.bestStreak >= 6) stars = 2
         else stars = 1
       }
       return {
@@ -80,15 +85,16 @@ const missions: MissionDefinition[] = [
     id: 'ukulele-endurance',
     title: 'Ukulele Endurance Run',
     description:
-      'Rack up 25 ukulele attempts. Stars reward endurance at 25, 40, and 60 attempts.',
+      'Rack up 15 ukulele attempts. Stars reward endurance at 15, 25, and 40 attempts.',
+    targetRoute: '/ukulele',
     evaluate: ({ ukulele }) => {
       const attempts = ukulele.totalAttempts
       let stars: 0 | 1 | 2 | 3 = 0
-      if (attempts >= 60) stars = 3
-      else if (attempts >= 40) stars = 2
-      else if (attempts >= 25) stars = 1
+      if (attempts >= 40) stars = 3
+      else if (attempts >= 25) stars = 2
+      else if (attempts >= 15) stars = 1
       return {
-        requirementsMet: attempts >= 25,
+        requirementsMet: attempts >= 15,
         stars,
         detail: `Attempts: ${attempts}`,
       }
@@ -98,16 +104,17 @@ const missions: MissionDefinition[] = [
     id: 'combo-sampler',
     title: 'Combo Sampler',
     description:
-      'Practice every instrument: log 15 attempts in each trainer. Extra stars for exceeding 25 and 40 attempts.',
+      'Practice every instrument: log 8 attempts in each trainer. Extra stars for exceeding 15 and 25 attempts.',
+    targetRoute: '/treble',
     evaluate: ({ treble, guitar, ukulele }) => {
       const attempts = [treble.totalAttempts, guitar.totalAttempts, ukulele.totalAttempts]
       const minAttempts = Math.min(...attempts)
       let stars: 0 | 1 | 2 | 3 = 0
-      if (minAttempts >= 40) stars = 3
-      else if (minAttempts >= 25) stars = 2
-      else if (minAttempts >= 15) stars = 1
+      if (minAttempts >= 25) stars = 3
+      else if (minAttempts >= 15) stars = 2
+      else if (minAttempts >= 8) stars = 1
       return {
-        requirementsMet: minAttempts >= 15,
+        requirementsMet: minAttempts >= 8,
         stars,
         detail: `Treble ${treble.totalAttempts} · Guitar ${guitar.totalAttempts} · Ukulele ${ukulele.totalAttempts}`,
       }
@@ -117,16 +124,17 @@ const missions: MissionDefinition[] = [
     id: 'all-star-challenge',
     title: 'All-Star Challenge',
     description:
-      'Reach 150 combined correct answers. Stars at 150, 250, and 400 correct answers across all trainers.',
+      'Reach 60 combined correct answers. Stars at 60, 120, and 200 correct answers across all trainers.',
+    targetRoute: '/treble',
     evaluate: ({ treble, guitar, ukulele }) => {
       const totalCorrect =
         treble.totalCorrect + guitar.totalCorrect + ukulele.totalCorrect
       let stars: 0 | 1 | 2 | 3 = 0
-      if (totalCorrect >= 400) stars = 3
-      else if (totalCorrect >= 250) stars = 2
-      else if (totalCorrect >= 150) stars = 1
+      if (totalCorrect >= 200) stars = 3
+      else if (totalCorrect >= 120) stars = 2
+      else if (totalCorrect >= 60) stars = 1
       return {
-        requirementsMet: totalCorrect >= 150,
+        requirementsMet: totalCorrect >= 60,
         stars,
         detail: `Combined correct answers: ${totalCorrect}`,
       }

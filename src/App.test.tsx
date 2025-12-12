@@ -39,6 +39,7 @@ vi.mock('./hooks/useMissions', () => ({
           id: 'treble-accuracy',
           title: 'Treble Accuracy Sprint',
           description: 'Mock mission',
+          targetRoute: '/treble',
         },
         evaluation: {
           requirementsMet: true,

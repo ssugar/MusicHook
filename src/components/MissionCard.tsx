@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import type { MissionWithState } from '../hooks/useMissions'
 import styles from './MissionCard.module.css'
 
@@ -60,14 +61,19 @@ function MissionCard({ mission, onRecord, isSaving }: MissionCardProps) {
           </div>
         )}
       </div>
-      <button
-        type="button"
-        className={styles.recordButton}
-        onClick={onRecord}
-        disabled={disabled}
-      >
-        {isSaving ? 'Saving…' : evaluation.requirementsMet ? 'Save mission attempt' : 'Keep practicing'}
-      </button>
+      <div className={styles.buttonRow}>
+        <Link className={styles.startButton} to={definition.targetRoute}>
+          Go to mission
+        </Link>
+        <button
+          type="button"
+          className={styles.recordButton}
+          onClick={onRecord}
+          disabled={disabled}
+        >
+          {isSaving ? 'Saving…' : evaluation.requirementsMet ? 'Save mission attempt' : 'Keep practicing'}
+        </button>
+      </div>
     </article>
   )
 }
