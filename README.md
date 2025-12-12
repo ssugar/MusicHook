@@ -50,6 +50,12 @@ npm run typecheck  # run TypeScript in --noEmit mode
 
 Each signed-in user stores aggregated trainer stats at `users/{uid}/progress/{trainerId}` (trainerId is `treble`, `guitar`, or `ukulele`). Documents contain the cumulative attempts, correct count, best streak, and a `lastUpdated` timestamp.
 
+### Missions & Stars
+
+- Missions live on the new `/missions` route (and nav link). Every mission is defined in `src/missions/definitions.ts` with thresholds for attempts, accuracy, or streaks across one or more trainers.
+- The UI (`MissionBoard` + `MissionCard`) evaluates the current stats client-side and lets the user record an attempt whenever the requirements are met. Stars (0–3) are derived automatically and stored at `users/{uid}/missions/{missionId}` along with attempt counts and timestamps.
+- All progress and mission documents are secured by the same per-user Firestore rules, so siblings cannot see each other’s stats even if they share a device.
+
 ## Project Structure
 
 ```

@@ -31,6 +31,30 @@ vi.mock('./hooks/useTrainerProgress', () => ({
   }),
 }))
 
+vi.mock('./hooks/useMissions', () => ({
+  useMissions: () => ({
+    missions: [
+      {
+        definition: {
+          id: 'treble-accuracy',
+          title: 'Treble Accuracy Sprint',
+          description: 'Mock mission',
+        },
+        evaluation: {
+          requirementsMet: true,
+          stars: 2,
+          detail: 'Mock detail',
+        },
+        record: null,
+      },
+    ],
+    loading: false,
+    error: null,
+    savingMissionId: null,
+    recordAttempt: vi.fn(),
+  }),
+}))
+
 describe('App routing', () => {
   afterEach(() => {
     cleanup()
@@ -54,6 +78,11 @@ describe('App routing', () => {
     await userEvent.click(screen.getByRole('link', { name: /Ukulele Trainer/i }))
     expect(
       await screen.findByRole('heading', { name: /Ukulele Fretboard Trainer/i }),
+    ).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('link', { name: /Missions/i }))
+    expect(
+      await screen.findByRole('heading', { name: /Weekly Missions/i }),
     ).toBeInTheDocument()
   })
 

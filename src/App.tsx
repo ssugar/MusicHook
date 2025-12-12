@@ -5,6 +5,7 @@ import styles from './App.module.css'
 import TrebleTrainer from './components/TrebleTrainer'
 import GuitarTrainer from './components/GuitarTrainer'
 import UkuleleTrainer from './components/UkuleleTrainer'
+import MissionBoard from './components/MissionBoard'
 import { useAuth } from './context/AuthContext'
 
 type ThemeMode = 'light' | 'dark' | 'high-contrast'
@@ -54,6 +55,7 @@ function App() {
       { to: '/treble', label: 'Treble Trainer' },
       { to: '/guitar', label: 'Guitar Trainer' },
       { to: '/ukulele', label: 'Ukulele Trainer' },
+      { to: '/missions', label: 'Missions' },
     ],
     [],
   )
@@ -130,6 +132,7 @@ function App() {
           <Route path="/treble" element={<TrebleTrainer />} />
           <Route path="/guitar" element={<GuitarTrainer />} />
           <Route path="/ukulele" element={<UkuleleTrainer />} />
+          <Route path="/missions" element={<MissionBoard />} />
           <Route path="*" element={<Navigate to="/treble" replace />} />
         </Routes>
       </main>

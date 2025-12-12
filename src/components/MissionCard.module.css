@@ -1,0 +1,95 @@
+.card {
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  padding: 1.2rem;
+  background: var(--surface-panel);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.description {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.detail {
+  margin: 0;
+  font-weight: 600;
+}
+
+.starRow {
+  text-align: right;
+}
+
+.starLabel {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.stars {
+  display: flex;
+  gap: 0.1rem;
+  align-items: center;
+  font-size: 1rem;
+}
+
+.starFilled {
+  color: var(--accent-strong);
+}
+
+.starEmpty {
+  color: var(--border-subtle);
+}
+
+.starCount {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-left: 0.25rem;
+}
+
+.progressRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.metricLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+
+.metricValue {
+  margin: 0.15rem 0 0;
+  font-weight: 600;
+}
+
+.recordButton {
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.65rem 1rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: var(--text-on-accent);
+  cursor: pointer;
+}
+
+.recordButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

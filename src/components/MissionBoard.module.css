@@ -1,0 +1,51 @@
+.board {
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1rem, 4vw, 2rem);
+}
+
+.header {
+  background: var(--surface-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1.25rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.kicker {
+  margin: 0 0 0.25rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+}
+
+.subtitle {
+  margin: 0.75rem 0 0;
+  color: var(--text-secondary);
+}
+
+.status {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--surface-muted);
+}
+
+.error {
+  background: var(--surface-incorrect);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
